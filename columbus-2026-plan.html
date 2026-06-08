@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Columbus HM">
+<meta name="theme-color" content="#0a0f14">
+<title>Columbus Half Marathon · Oct 18, 2026</title>
+
+<!-- Inline SVG favicon / apple-touch-icon as data URI -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0f14'/%3E%3Ctext y='62' x='50' text-anchor='middle' font-size='56' font-family='serif'%3E🏃%3C/text%3E%3C/svg%3E">
+
+<style>
+  :root {
+    --bg: #0a0f14;
+    --surface: #0d1b26;
+    --surface2: #080f16;
+    --border: #1e2d3d;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --text4: #475569;
+    --accent-run: #34d399;
+    --accent-cross: #38bdf8;
+    --accent-strength: #f472b6;
+    --accent-rest: #94a3b8;
+    --accent-recovery: #fbbf24;
+    --accent-race: #eab308;
+    --phase-base: #34d399;
+    --phase-recovery: #f59e0b;
+    --phase-build: #38bdf8;
+    --phase-peak: #f87171;
+    --phase-taper: #a78bfa;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overscroll-behavior: none;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    border-bottom: 1px solid #1e3a4a;
+    padding: calc(var(--safe-top) + 1.25rem) 1.25rem 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-eyebrow { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: #64b5c8; margin-bottom: 0.2rem; }
+  .header-title { font-size: clamp(1.1rem, 5vw, 1.6rem); font-weight: 700; color: #f0f9ff; line-height: 1.15; margin-bottom: 0.15rem; }
+  .header-sub { font-size: 0.75rem; color: var(--text2); margin-bottom: 0.1rem; }
+  .header-sub2 { font-size: 0.7rem; color: var(--text3); }
+  .legend { display: flex; gap: 0.85rem; flex-wrap: wrap; margin-top: 0.85rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.35rem; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 0.67rem; color: #cbd5e1; }
+
+  /* MAIN SCROLL AREA */
+  .main { padding: 1.1rem 1.1rem calc(var(--safe-bottom) + 1.5rem); max-width: 680px; margin: 0 auto; }
+
+  /* WEEK SELECTOR */
+  .week-selector-label { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.6rem; }
+  .week-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.28rem; margin-bottom: 1.25rem; }
+  .week-btn {
+    padding: 0.42rem 0;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text4);
+    font-size: 0.7rem;
+    font-family: inherit;
+    cursor: pointer;
+    line-height: 1.3;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+  }
+  .week-btn.active { background: #0f1f2d; font-weight: 700; }
+  .week-btn-date { font-size: 0.55rem; opacity: 0.7; display: block; }
+
+  /* WEEK HEADER CARD */
+  .week-card {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    margin-bottom: 0.9rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .week-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; }
+  .week-card-meta { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text4); margin-bottom: 0.12rem; }
+  .week-card-phase { font-size: 1.2rem; font-weight: 700; }
+  .week-card-miles-label { font-size: 0.58rem; color: var(--text4); text-transform: uppercase; letter-spacing: 0.1em; text-align: right; }
+  .week-card-miles { font-size: 1rem; font-weight: 700; color: var(--text2); text-align: right; }
+  .week-card-note { font-size: 0.76rem; color: var(--text3); line-height: 1.55; }
+
+  /* DAY ROWS */
+  .days { display: flex; flex-direction: column; gap: 0.4rem; }
+  .day-row {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    padding: 0.75rem 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .day-row-top { display: flex; justify-content: space-between; align-items: center; }
+  .day-row-left { display: flex; align-items: center; gap: 0.65rem; }
+  .day-label { font-size: 0.68rem; font-weight: 700; color: var(--text4); width: 26px; font-family: monospace; flex-shrink: 0; }
+  .day-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+  .day-row-right { display: flex; align-items: center; gap: 0.4rem; }
+  .day-badge {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+  .day-chevron { color: var(--text4); font-size: 0.7rem; }
+
+  /* DAY DETAIL */
+  .day-detail {
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    display: none;
+  }
+  .day-detail.open { display: block; }
+  .detail-line { font-size: 0.78rem; color: var(--text2); line-height: 1.65; }
+  .detail-line.header { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .detail-line.warning { color: #fbbf24; }
+  .detail-line.spacer { height: 0.4rem; }
+
+  /* NAV BUTTONS */
+  .nav { display: flex; gap: 0.65rem; margin-top: 1.1rem; }
+  .nav-btn {
+    flex: 1;
+    padding: 0.65rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    transition: color 0.15s;
+  }
+  .nav-btn:disabled { color: var(--text4); cursor: default; }
+
+  /* PRINCIPLES */
+  .principles { margin-top: 1.6rem; padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); }
+  .principles-title { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text4); margin-bottom: 0.7rem; }
+  .principle { display: flex; gap: 0.65rem; align-items: flex-start; margin-bottom: 0.5rem; }
+  .principle-icon { font-size: 0.9rem; flex-shrink: 0; line-height: 1.5; }
+  .principle-text { font-size: 0.77rem; line-height: 1.55; }
+  .principle-title { font-weight: 700; color: #cbd5e1; }
+  .principle-desc { color: var(--text3); }
+
+  .footer { margin-top: 0.9rem; font-size: 0.65rem; color: #334155; text-align: center; line-height: 1.6; padding-bottom: 0.5rem; }
+
+  /* Install banner */
+  .install-banner {
+    background: #0f2d1e;
+    border: 1px solid #166534;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.78rem;
+    color: #86efac;
+    line-height: 1.55;
+    display: none;
+  }
+  .install-banner.show { display: block; }
+  .install-banner strong { color: var(--accent-run); }
+  .install-close { float: right; cursor: pointer; color: var(--text3); font-size: 1rem; line-height: 1; margin-left: 0.5rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">18-Week Program · Starts June 8, 2026</div>
+  <div class="header-title">Columbus Half Marathon</div>
+  <div class="header-sub">Nationwide Children's Hospital · October 18, 2026 · 7:30am</div>
+  <div class="header-sub2">51-year-old runner · 5K base · Injury-free distance focus</div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-run)"></div><span class="legend-label">Run</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-cross)"></div><span class="legend-label">Cross-Train</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-strength)"></div><span class="legend-label">Strength</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-rest)"></div><span class="legend-label">Rest</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-recovery)"></div><span class="legend-label">Recovery</span></div>
+  </div>
+</div>
+
+<div class="main">
+  <div id="installBanner" class="install-banner">
+    <span class="install-close" onclick="document.getElementById('installBanner').classList.remove('show')">✕</span>
+    <strong>Add to Home Screen:</strong> tap the Share button (□↑) in Safari, then choose <strong>"Add to Home Screen"</strong> to use this as an app.
+  </div>
+
+  <div class="week-selector-label">Select Week</div>
+  <div class="week-grid" id="weekGrid"></div>
+  <div class="week-card" id="weekCard"></div>
+  <div class="days" id="daysContainer"></div>
+  <div class="nav">
+    <button class="nav-btn" id="prevBtn" onclick="changeWeek(-1)">← Prev Week</button>
+    <button class="nav-btn" id="nextBtn" onclick="changeWeek(1)">Next Week →</button>
+  </div>
+  <div class="principles" id="principles"></div>
+  <div class="footer">
+    Tap any day to expand · Mon strength · Tue/Thu/Sat runs · Wed cross-train · Fri stretch · Sun recovery<br>
+    Columbus Half Marathon · October 18, 2026 · 7:30am
+  </div>
+</div>
+
+<script>
+const WEEK_DATES = ["Jun 8","Jun 15","Jun 22","Jun 29","Jul 6","Jul 13","Jul 20","Jul 27","Aug 3","Aug 10","Aug 17","Aug 24","Aug 31","Sep 7","Sep 14","Sep 21","Sep 28","Oct 5"];
+
+const STRENGTH = {
+  "Base Building": {
+    lower: [
+      ["Glute Bridges","2×12","Feet flat, drive through heels. Pause 1 sec at top."],
+      ["Clamshells","2×12 each","Bodyweight. Control the motion, don't rush."],
+      ["Calf Raises","2×15","Slow 3-count down. Achilles insurance."],
+      ["Dead Bugs","2×8 each","Lower back stays pressed to floor throughout."],
+      ["Step-Downs","2×8 each","Single leg off a step. Control the descent slowly."],
+    ],
+    upper: [
+      ["Band Pull-Aparts","2×15","Arms straight, pull band to chest. Posture muscles."],
+      ["Band Rows","2×12","Anchor at waist height. Pull elbows back, squeeze shoulder blades."],
+      ["Band Face Pulls","2×12","Anchor at head height. Pull to forehead, elbows high. Rotator cuff health."],
+      ["Band Bicep Curls","2×12","Stand on band. Controlled tempo."],
+    ]
+  },
+  "Recovery Week": {
+    lower: [
+      ["Glute Bridges","2×10","Light effort. Keep it easy this week."],
+      ["Clamshells","2×10 each","Bodyweight only."],
+      ["Calf Raises","2×12","Slow and controlled."],
+      ["Dead Bugs","2×6 each","Focus on breathing and control."],
+    ],
+    upper: [
+      ["Band Pull-Aparts","2×12","Light band. Recovery week — back off intensity."],
+      ["Band Rows","2×10","Lighter resistance than normal weeks."],
+      ["Band Face Pulls","2×10","Easy effort."],
+    ]
+  },
+  "Build Phase": {
+    lower: [
+      ["Single-Leg Glute Bridges","3×10 each","Progress from two-leg version. Keep hips level."],
+      ["Clamshells","3×15 each","Add light band if bodyweight feels easy."],
+      ["Calf Raises","3×20","Slow 3-count down. Single leg if ready."],
+      ["Dead Bugs","3×10 each","Add arm reach for more challenge."],
+      ["Step-Downs","3×10 each","Increase depth slightly if comfortable."],
+      ["Hip Flexor Stretch","60 sec each","Critical for desk workers. Not optional."],
+    ],
+    upper: [
+      ["Band Pull-Aparts","3×15","Step up band resistance from base phase."],
+      ["Band Rows","3×12","Add resistance or slow the tempo."],
+      ["Band Face Pulls","3×12","Focus on external rotation at end range."],
+      ["Band Bicep Curls","3×12","Controlled tempo. Full range of motion."],
+      ["Band Overhead Press","2×12","Stand on band. Core stays braced."],
+    ]
+  },
+  "Peak Build": {
+    lower: [
+      ["Single-Leg Glute Bridges","3×12 each","These should feel solid by now."],
+      ["Clamshells","3×15 each","Band throughout. Controlled motion."],
+      ["Single-Leg Calf Raises","3×15 each","Slow 3-count down. Achilles protection at high mileage."],
+      ["Dead Bugs","3×10 each","Full extension. Back flat the whole time."],
+      ["Step-Downs","3×12 each","Controlled descent. Knee protection movement."],
+      ["Hip Flexor Stretch","60 sec each","More important than ever at peak mileage."],
+    ],
+    upper: [
+      ["Band Pull-Aparts","3×15","Maintain resistance from build phase."],
+      ["Band Rows","3×12","Add a 2-sec hold at full contraction."],
+      ["Band Face Pulls","3×15","Higher reps for shoulder endurance."],
+      ["Band Bicep Curls","3×12","Steady effort."],
+      ["Band Overhead Press","3×12","Progress from 2 sets."],
+    ]
+  },
+  "Taper": {
+    lower: [
+      ["Single-Leg Glute Bridges","2×10 each","Backing off volume. Maintain movement quality."],
+      ["Clamshells","2×12 each","Light band."],
+      ["Single-Leg Calf Raises","2×12 each","Keep doing these through taper."],
+      ["Dead Bugs","2×8 each","Easy effort."],
+    ],
+    upper: [
+      ["Band Pull-Aparts","2×12","Reduced volume."],
+      ["Band Rows","2×10","Lighter effort."],
+      ["Band Face Pulls","2×12","Maintain shoulder health."],
+    ]
+  },
+  "Final Taper": {
+    lower: [
+      ["Single-Leg Glute Bridges","2×8 each","Just maintaining. No new stimulus."],
+      ["Clamshells","2×10 each","Light band."],
+      ["Single-Leg Calf Raises","2×10 each","Keep legs feeling sharp."],
+    ],
+    upper: [
+      ["Band Pull-Aparts","2×10","Light."],
+      ["Band Rows","2×10","Easy effort."],
+      ["Band Face Pulls","2×10","Maintain only."],
+    ]
+  },
+  "Race Week": {
+    lower: [["Glute Bridges","1×8","Monday only. Activating, not training."]],
+    upper: [["Band Pull-Aparts","1×8","Loosening up only."]]
+  }
+};
+
+function strengthDesc(phase) {
+  const s = STRENGTH[phase] || STRENGTH["Base Building"];
+  const lower = s.lower.map(e => `${e[0]} — ${e[1]}: ${e[2]}`).join("\n");
+  const upper = s.upper.map(e => `${e[0]} — ${e[1]}: ${e[2]}`).join("\n");
+  return `LOWER BODY (bodyweight):\n${lower}\n\nUPPER BODY (bands):\n${upper}`;
+}
+
+function makeDays(phase, tue, thu, longRun, crossMins, repeatNote) {
+  return [
+    { day:"Mon", type:"strength", label:"Strength — 20–25 min", desc: strengthDesc(phase) },
+    { day:"Tue", type:"run", label:`Run ${tue[0]}`, desc: tue[1] },
+    { day:"Wed", type:"cross", label:`Cross-Train — ${crossMins} min`, desc:"Hydrow rowing or cycling. Low impact aerobic work. Moderate effort. Builds fitness without adding run stress to your legs." },
+    { day:"Thu", type:"run", label:`Run ${thu[0]}`, desc: thu[1] },
+    { day:"Fri", type:"rest", label:"Rest / Stretch", desc:"Foam rolling: quads, hamstrings, calves, IT band. Hip flexor stretch 60 sec each side. 10–15 min minimum. Pre-long-run prep." },
+    { day:"Sat", type:"run", label:`Long Run ${longRun[0]}`, desc: longRun[1] + (repeatNote ? `\n\n⚠️ REPEAT IF NEEDED: ${repeatNote}` : "") },
+    { day:"Sun", type:"recovery", label:"Active Recovery", desc:"20–30 min easy walk or gentle yoga. Keep blood moving. Don't sit still after a long run." },
+  ];
+}
+
+const PLAN = [
+  { week:1, phase:"Base Building", totalMiles:"10–11", note:"First week adding strength + cross-training. Keep everything easy while your body adjusts to new load.", days: makeDays("Base Building",["3 mi","Easy conversational pace. 10:00–10:30/mi. If you can't speak in full sentences, slow down."],["3 mi","Same easy effort as Tuesday. Focus on form — short stride, slight forward lean, relaxed hands."],["3.5 mi","First long run. 10:30–11:00/mi. Slowest pace of the week. Time on feet is the goal."],30,"If legs feel heavy from Monday strength, repeat 3.5 mi next week before moving to 4 mi.") },
+  { week:2, phase:"Base Building", totalMiles:"11–12", note:"Body adapting to the new schedule. Strength soreness should be easing by mid-week.", days: makeDays("Base Building",["3 mi","Easy pace. Notice any lingering soreness from week 1."],["3 mi","Easy effort. Optional: 4×20-sec strides at the very end to wake up legs."],["4 mi","Half-mile bump. Easy pace throughout. Walk breaks fine."],30,"If Monday strength is still causing leg fatigue on Saturday, stay at 4 mi before moving up.") },
+  { week:3, phase:"Base Building", totalMiles:"12–13", note:"Routine should be feeling more natural now. Resist any urge to push pace.", days: makeDays("Base Building",["3 mi","Easy pace. Starting to feel like a routine."],["3.5 mi","Easy effort. Core feeling more engaged from Monday dead bugs."],["4.5 mi","Another half-mile bump. Bring water if over 50 min. Easy pace."],35,null) },
+  { week:4, phase:"Recovery Week", totalMiles:"8–9", note:"First cutback week. Non-negotiable at 50+. Your body catches up and locks in fitness during these weeks.", days: makeDays("Recovery Week",["2.5 mi","Short and easy. Enjoy the lighter load."],["2.5 mi","Easy effort. Legs should feel noticeably fresher by end of week."],["3 mi","Reduced long run. Easy pace. Fitness from weeks 1–3 is consolidating."],25,null) },
+  { week:5, phase:"Build Phase", totalMiles:"13–14", note:"Build phase begins. Strength progresses to 3 sets with harder variations.", days: makeDays("Build Phase",["3.5 mi","Feeling fresher after cutback. Keep it easy regardless of how good legs feel."],["3.5 mi","Easy effort. Optional: 5×20-sec strides at end."],["5 mi","Bigger jump after cutback week — picking up where week 3 left off plus half mile. Bring water. Easy pace."],40,"If the jump from 3→5 mi feels like too much, do 4.5 mi and add the extra half mile next week.") },
+  { week:6, phase:"Build Phase", totalMiles:"15–16", note:"Steady build. You're covering real distance now.", days: makeDays("Build Phase",["4 mi","Easy conversational pace."],["4 mi","Easy effort."],["6 mi","One-mile bump. Fuel/water if over 60 min. Easy pace throughout."],40,null) },
+  { week:7, phase:"Build Phase", totalMiles:"16–17", note:"Single-leg calf raises available now if week 6 felt manageable.", days: makeDays("Build Phase",["4 mi","Easy pace."],["4 mi","Easy effort."],["7 mi","One-mile bump. Fuel at mile 4. Easy pace. Walk 1 min every mile if needed — no shame in it."],40,"If any new knee or hip soreness emerged in week 6, repeat 6 mi before moving to 7.") },
+  { week:8, phase:"Recovery Week", totalMiles:"11–12", note:"Second cutback week. Critical after three hard build weeks. Assess any niggles that appeared.", days: makeDays("Recovery Week",["3 mi","Short and easy. Note any lingering soreness from weeks 5–7."],["3 mi","Easy pace. Any issues from build phase should be evaluated this week."],["4.5 mi","Cutback long run. Should feel comfortable. You've got 7 miles in the bank."],30,null) },
+  { week:9, phase:"Peak Build", totalMiles:"18–19", note:"Peak build begins. Double-digit long runs incoming. Strength at full volume now.", days: makeDays("Peak Build",["4.5 mi","Easy pace. You've got a solid base."],["4.5 mi","Easy effort."],["8 mi","One-mile bump. Fuel every 45 min. Easy pace non-negotiable."],45,null) },
+  { week:10, phase:"Peak Build", totalMiles:"19–20", note:"Body may feel cumulative fatigue this week. That's normal. Trust the plan.", days: makeDays("Peak Build",["4.5 mi","Easy pace. If legs are tired from week 9, that's expected."],["4.5 mi","Easy effort."],["9 mi","One-mile bump. Fuel at miles 3 and 7. Easy pace. Walk if needed."],45,"If week 9 left you notably fatigued into Thursday, repeat 8 mi before moving to 9.") },
+  { week:11, phase:"Peak Build", totalMiles:"20–21", note:"Second double-digit long run week. This is where the real fitness is built.", days: makeDays("Peak Build",["5 mi","Easy pace."],["4.5 mi","Easy effort."],["10 mi","Double-digit milestone. Fuel every 40 min. This run will take 1hr 40+. Treat it with respect."],45,null) },
+  { week:12, phase:"Recovery Week", totalMiles:"13–14", note:"Third cutback week. Let the peak build weeks absorb fully before the final push.", days: makeDays("Recovery Week",["3.5 mi","Easy and short. You've earned this lighter week."],["3.5 mi","Easy pace."],["6 mi","Comfortable cutback long run. You've got 10 miles in the bank."],30,null) },
+  { week:13, phase:"Peak Build", totalMiles:"21–22", note:"Final peak build block. Two big long runs remain before taper.", days: makeDays("Peak Build",["5 mi","Easy pace."],["5 mi","Easy effort."],["11 mi","One-mile bump from week 11 peak. Fuel early and often. Easy pace."],45,"If week 12 cutback didn't leave you feeling recovered, repeat 10 mi before attempting 11.") },
+  { week:14, phase:"Peak Build", totalMiles:"22–23", note:"Your longest training run this week. This is the peak of the entire plan.", days: makeDays("Peak Build",["5 mi","Easy pace."],["5 mi","Easy effort."],["12 mi","Your longest training run. Race-day rehearsal — wear race shoes, fuel exactly as you plan to on Oct 18. Start at 10:30/mi."],45,null) },
+  { week:15, phase:"Taper", totalMiles:"17–18", note:"Taper begins. Resist every urge to add miles. Your legs may feel oddly flat — completely normal taper response.", days: makeDays("Taper",["4.5 mi","Easy pace. Taper begins — don't add miles even if you feel great."],["4 mi","Easy effort. Strength drops back to 2 sets this week."],["9 mi","Volume dropping. Easy pace. Trust what you've built."],35,null) },
+  { week:16, phase:"Taper", totalMiles:"14–15", note:"Continued taper. Legs should start feeling springier. The fitness is locked in.", days: makeDays("Taper",["4 mi","Easy pace. Legs should feel noticeably better than peak weeks."],["3.5 mi","Easy effort."],["7 mi","Volume continues to drop. Easy pace. You've got 12 miles in the bank."],30,null) },
+  {
+    week:17, phase:"Final Taper", totalMiles:"10–11", note:"Race is 8 days away. Everything is about freshness now. Short, easy, sharp.",
+    days: [
+      { day:"Mon", type:"strength", label:"Strength — 15 min", desc: strengthDesc("Final Taper") },
+      { day:"Tue", type:"run", label:"Run 3 mi", desc:"Easy shakeout. Legs should feel good. Don't push." },
+      { day:"Wed", type:"cross", label:"Cross-Train — 20 min", desc:"Very easy effort only. Just keep blood flowing." },
+      { day:"Thu", type:"run", label:"Run 2.5 mi", desc:"Easy effort. 4×20-sec strides optional to feel sharp." },
+      { day:"Fri", type:"rest", label:"Rest / Stretch", desc:"Full mobility session. Hip flexors, calves, IT band. Lay out race gear tonight." },
+      { day:"Sat", type:"run", label:"Shakeout 2 mi", desc:"Very easy 2 miles. Stay off feet the rest of the day. Check the course map." },
+      { day:"Sun", type:"recovery", label:"Rest", desc:"Full rest. Hydrate well all day. Sleep early. Race is next Sunday." },
+    ]
+  },
+  {
+    week:18, phase:"Race Week", totalMiles:"Race! 🏅", note:"Race week. Everything since June 8 has been for Sunday October 18. Your only job now is to arrive fresh.",
+    days: [
+      { day:"Mon", type:"strength", label:"Strength — 10 min only", desc:"LOWER BODY:\nGlute Bridges — 1×8: Activating, not training.\n\nUPPER BODY (bands):\nBand Pull-Aparts — 1×8: Loosening up only.\n\nThat's it. Don't do more." },
+      { day:"Tue", type:"run", label:"Easy Run 2 mi", desc:"Short and easy. Just to feel the legs moving. Zero effort." },
+      { day:"Wed", type:"rest", label:"Rest / Walk", desc:"Light 20-min walk. Stay off feet otherwise. Hydrate well." },
+      { day:"Thu", type:"run", label:"Shakeout 1.5 mi", desc:"Very easy. 3×20-sec strides to feel sharp. Keep it short." },
+      { day:"Fri", type:"rest", label:"Rest", desc:"Full rest. Carb-load dinner. Pack race bag. Everything ready to go." },
+      { day:"Sat", type:"rest", label:"Rest", desc:"Rest or very short walk. Visualize the race. Sleep by 9pm. Corrals open at 6am tomorrow." },
+      { day:"Sun", type:"run", label:"🏅 RACE DAY — Columbus Half Marathon", desc:"Start time: 7:30am. Corrals open 6am.\n\nRace plan: Start at 10:15–10:30/mi for the first 8 miles. The course is flat — trust your legs. Miles 9–11 open it up slightly if feeling good. Leave it all on the course for mile 12–13.1.\n\nYou've done the work since June 8. The fitness is there. Enjoy every mile — especially the ones with the Nationwide Children's patients cheering you on." },
+    ]
+  }
+];
+
+const TYPE_COLORS = {
+  run:      { dot:"#34d399", border:"#166534", bg:"#052e16" },
+  cross:    { dot:"#38bdf8", border:"#0c4a6e", bg:"#0c2340" },
+  rest:     { dot:"#94a3b8", border:"#334155", bg:"#0f172a" },
+  recovery: { dot:"#fbbf24", border:"#78350f", bg:"#1c1003" },
+  strength: { dot:"#f472b6", border:"#831843", bg:"#1a0010" },
+};
+
+const PHASE_ACCENT = {
+  "Base Building":"#34d399", "Recovery Week":"#f59e0b",
+  "Build Phase":"#38bdf8", "Peak Build":"#f87171",
+  "Taper":"#a78bfa", "Final Taper":"#a78bfa", "Race Week":"#eab308"
+};
+
+let currentWeek = 1;
+let expandedDay = null;
+
+function phaseAccent(phase) { return PHASE_ACCENT[phase] || "#34d399"; }
+
+function renderWeekGrid() {
+  const grid = document.getElementById("weekGrid");
+  grid.innerHTML = PLAN.map(w => {
+    const ac = phaseAccent(w.phase);
+    const active = w.week === currentWeek;
+    return `<button class="week-btn${active?" active":""}" onclick="selectWeek(${w.week})"
+      style="border-color:${active?ac:"#1e2d3d"};color:${active?ac:"#475569"}">
+      W${w.week}<span class="week-btn-date">${WEEK_DATES[w.week-1]}</span>
+    </button>`;
+  }).join("");
+}
+
+function renderWeekCard() {
+  const w = PLAN[currentWeek-1];
+  const ac = phaseAccent(w.phase);
+  const card = document.getElementById("weekCard");
+  card.style.borderColor = ac + "33";
+  card.style.background = ac + "0a";
+  card.innerHTML = `
+    <div class="week-card-top">
+      <div>
+        <div class="week-card-meta">Week ${w.week} of 18 · ${WEEK_DATES[w.week-1]}</div>
+        <div class="week-card-phase" style="color:${ac}">${w.phase}</div>
+      </div>
+      <div>
+        <div class="week-card-miles-label">Weekly Miles</div>
+        <div class="week-card-miles">${w.totalMiles}</div>
+      </div>
+    </div>
+    <div class="week-card-note">${w.note}</div>
+  `;
+}
+
+function renderDays() {
+  const w = PLAN[currentWeek-1];
+  const container = document.getElementById("daysContainer");
+  container.innerHTML = w.days.map((d, i) => {
+    const isRace = d.label.includes("RACE DAY");
+    const s = isRace ? { dot:"#eab308", border:"#713f12", bg:"#1a1400" } : TYPE_COLORS[d.type];
+    const badgeLabel = isRace ? "race" : d.type === "recovery" ? "active rec" : d.type;
+    const titleColor = isRace ? "#fde047" : "#e2e8f0";
+    const isOpen = expandedDay === i;
+
+    const detailLines = d.desc.split("\n").map(line => {
+      if (!line.trim()) return `<div class="detail-line spacer"></div>`;
+      const isHeader = line.startsWith("LOWER") || line.startsWith("UPPER") || line.startsWith("Race plan");
+      const isWarn = line.startsWith("⚠️");
+      const cls = isHeader ? "header" : isWarn ? "warning" : "";
+      const color = isHeader ? s.dot : isWarn ? "#fbbf24" : "#94a3b8";
+      return `<div class="detail-line ${cls}" style="color:${color}">${line}</div>`;
+    }).join("");
+
+    return `<div class="day-row" onclick="toggleDay(${i})"
+      style="border-color:${s.border};border-left-color:${s.dot};background:${s.bg}">
+      <div class="day-row-top">
+        <div class="day-row-left">
+          <span class="day-label">${d.day}</span>
+          <span class="day-title" style="color:${titleColor}">${d.label}</span>
+        </div>
+        <div class="day-row-right">
+          <span class="day-badge" style="background:${s.border};color:${s.dot}">${badgeLabel}</span>
+          <span class="day-chevron">${isOpen?"▲":"▼"}</span>
+        </div>
+      </div>
+      <div class="day-detail${isOpen?" open":""}" style="border-top:1px solid ${s.border}">
+        ${detailLines}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderNav() {
+  document.getElementById("prevBtn").disabled = currentWeek === 1;
+  document.getElementById("nextBtn").disabled = currentWeek === 18;
+}
+
+function renderPrinciples() {
+  const items = [
+    ["🔄","80% Easy","Conversational pace on all runs. If you can't speak full sentences, slow down."],
+    ["📉","4 Cutback Weeks","Weeks 4, 8, 12, and 15 drop mileage ~30%. Your body consolidates fitness during these weeks."],
+    ["⚠️","Repeat If Needed","Days with ⚠️ notes have explicit repeat guidance. Use your body as the signal."],
+    ["💪","Mon Strength","Bodyweight lower + band upper. 48hrs before Tuesday run, 72hrs before Saturday long run."],
+    ["🚣","Wed Cross-Train","Hydrow rowing builds aerobic fitness with zero run-impact stress."],
+    ["😴","Sleep & Nutrition","Protein within 30 min post-run. 7–8 hrs sleep. This is when fitness is actually built."],
+    ["🦵","Pain vs. Soreness","Dull muscle soreness = normal. Sharp, joint, or bone pain = stop and rest 2+ days."],
+  ];
+  document.getElementById("principles").innerHTML = `
+    <div class="principles-title">Key Principles</div>
+    ${items.map(([icon,title,desc]) => `
+      <div class="principle">
+        <span class="principle-icon">${icon}</span>
+        <div class="principle-text">
+          <span class="principle-title">${title}: </span>
+          <span class="principle-desc">${desc}</span>
+        </div>
+      </div>`).join("")}
+  `;
+}
+
+function render() {
+  renderWeekGrid();
+  renderWeekCard();
+  renderDays();
+  renderNav();
+}
+
+function selectWeek(n) {
+  currentWeek = n;
+  expandedDay = null;
+  render();
+  document.querySelector(".main").scrollTo({ top: 0 });
+  window.scrollTo({ top: 0 });
+}
+
+function changeWeek(delta) {
+  const next = currentWeek + delta;
+  if (next >= 1 && next <= 18) selectWeek(next);
+}
+
+function toggleDay(i) {
+  expandedDay = expandedDay === i ? null : i;
+  renderDays();
+}
+
+// Show install banner on iOS Safari (not standalone)
+function checkInstallBanner() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  const dismissed = localStorage.getItem("installDismissed");
+  if (isIOS && !isStandalone && !dismissed) {
+    document.getElementById("installBanner").classList.add("show");
+    document.querySelector(".install-close").addEventListener("click", () => {
+      localStorage.setItem("installDismissed", "1");
+    });
+  }
+}
+
+// Init
+renderPrinciples();
+render();
+checkInstallBanner();
+
+// Service worker for offline use
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'columbus-hm-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './columbus-half-marathon.html'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
